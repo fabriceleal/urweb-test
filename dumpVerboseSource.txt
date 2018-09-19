@@ -1,0 +1,128 @@
+:0:0: (to 0:0) Anonymous function remains at code generation
+JavaScript()
+ 
+ val
+  unmarshal_substring__1964 as Regex/unmarshal_substring :
+   FFI(Regex__FFI.substring_t) ->
+    {Len : FFI(Basis.int), Start : FFI(Basis.int)} =
+   (fn substring : FFI(Regex__FFI.substring_t) =>
+     {Len = FFI(Regex__FFI.substring_length(substring_0)), 
+       Start = FFI(Regex__FFI.substring_start(substring_0))})
+ 
+ val rec
+  $loop__1966 as Regex/loop :
+   FFI(Regex__FFI.substring_list_t) ->
+    FFI(Basis.int) ->
+     FFI(Basis.int) ->
+      list({Len : FFI(Basis.int), Start : FFI(Basis.int)}) =
+   (fn substrings : FFI(Regex__FFI.substring_list_t) =>
+     (fn n_groups : FFI(Basis.int) =>
+       (fn n : FFI(Basis.int) =>
+         (case (n_groups_1 <= n_0)
+           return
+            list({Len : FFI(Basis.int), Start : FFI(Basis.int)}) of
+           FFIC(Basis.True) => None | 
+            FFIC(Basis.False) =>
+             Some
+              {1 =
+                unmarshal_substring__1964
+                 FFI(Regex__FFI.substring_list_get(substrings_2, n_0)),
+                                                                       
+                2 = $loop__1966 substrings_2 n_groups_1 (n_0 + 1)}))))
+ 
+ val rec
+  $rev'_unpoly__1982 as List/rev' :
+   list(FFI(Basis.string)) ->
+    list(FFI(Basis.string)) -> list(FFI(Basis.string)) =
+   (fn acc : list(FFI(Basis.string)) =>
+     (fn ls : list(FFI(Basis.string)) =>
+       (case ls_0 return list(FFI(Basis.string)) of
+         None => acc_1 | 
+          Some[{1 : FFI(Basis.string), 2 : list(FFI(Basis.string))}]
+           {1 = x, 2 = ls} =>
+           $rev'_unpoly__1982 (Some {1 = x_1, 2 = acc_3}) ls_0)))
+ 
+ val rec
+  $mp'_unpoly_unpoly__1983 as List/mp' :
+   list(FFI(Basis.string)) ->
+    list({Len : FFI(Basis.int), Start : FFI(Basis.int)}) ->
+     list(FFI(Basis.string)) =
+   (fn acc : list(FFI(Basis.string)) =>
+     (fn ls : list({Len : FFI(Basis.int), Start : FFI(Basis.int)}) =>
+       (case ls_0 return list(FFI(Basis.string)) of
+         None => $rev'_unpoly__1982 None acc_1 | 
+          Some[{1 : {Len : FFI(Basis.int), Start : FFI(Basis.int)}, 
+                 2 :
+                  list({Len : FFI(Basis.int), Start : FFI(Basis.int)})}]
+           {1 = x, 2 = ls} =>
+           $mp'_unpoly_unpoly__1983
+            (Some
+              {1 =
+                (case x_1 return FFI(Basis.string) of
+                  {Start = start, Len = len} =>
+                   FFI(Basis.substring("test 123", start_1, len_0))), 
+                2 = acc_3}) ls_0)))
+ 
+ val
+  wrap_index__1979 as Test/index : {} -> {} -> {} =
+   (fn x0 : {} =>
+     (let r : FFI(Basis.bool) =
+      ((case
+         (case
+           (let substrings : FFI(Regex__FFI.substring_list_t) =
+            (FFI(Regex__FFI.do_match((case
+                                       FFI(Basis.strlenGe("t 1", 1))
+                                       return FFI(Basis.string) of
+                                       FFIC(Basis.True) => "t 1" | 
+                                        FFIC(Basis.False) =>
+                                         (error "regex: Empty regex"
+                                          : FFI(Basis.string))), 
+                                      "test 123"))) in
+            ((case
+               FFI(Regex__FFI.substring_list_length(substrings_0))
+               return
+                option({Groups :
+                         list({Len : FFI(Basis.int), 
+                                Start : FFI(Basis.int)}), 
+                         Whole :
+                          {Len : FFI(Basis.int), 
+                            Start : FFI(Basis.int)}}) of
+               0 => None | 
+                n_groups =>
+                 Some
+                  {Groups = $loop__1966 substrings_1 n_groups_0 1, 
+                    Whole =
+                     unmarshal_substring__1964
+                      FFI(Regex__FFI.substring_list_get(substrings_1, 
+                                                         0))})))
+           return
+            option({Groups : list(FFI(Basis.string)), 
+                     Whole : FFI(Basis.string)}) of
+           None => None | 
+            Some[{Groups :
+                   list({Len : FFI(Basis.int), Start : FFI(Basis.int)}),
+                                                                        
+                   Whole :
+                    {Len : FFI(Basis.int), Start : FFI(Basis.int)}}]
+             y =>
+             Some
+              {Groups = $mp'_unpoly_unpoly__1983 None y_0.Groups, 
+                Whole =
+                 (case y_0.Whole return FFI(Basis.string) of
+                   {Start = start, Len = len} =>
+                    FFI(Basis.substring("test 123", start_1, len_0)))})
+         return FFI(Basis.bool) of
+         None => FFIC(Basis.False) | 
+          Some[{Groups : list(FFI(Basis.string)), 
+                 Whole : FFI(Basis.string)}] _ => FFIC(Basis.True)))
+      in
+      ((fn _ : {} =>
+         (write("\n<body");
+          (write(FFI(Basis.maybe_onload(FFI(Basis.get_settings({})))));
+           (write(FFI(Basis.maybe_onunload("")));
+            (write(">\n");
+             ((case r_1 return {} of
+                FFIC(Basis.False) => write("none") | 
+                 FFIC(Basis.True) => write("something"));
+              write("\n</body>\n"))))))))))
+ export link(r) wrap_index__1979 as Test/index ({}) ({}) -> {}
